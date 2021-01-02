@@ -23,6 +23,7 @@ public final class Uchiro extends JavaPlugin {
     int max;
     int stock;
     Random random = new Random();
+    int sum;
 
     @Override
     public void onEnable() {
@@ -162,7 +163,6 @@ public final class Uchiro extends JavaPlugin {
 
     public boolean HasMoney(Player s, int m) {
         //ここで所持金が足りているかの判定をする、エラー吐かれたくないから今はreturn true;で終わらせておく
-        Bukkit.broadcastMessage(prefix+"ヽ(ﾟ∀｡)ﾉｳｪ");
         return true;
     }
 
@@ -174,9 +174,14 @@ public final class Uchiro extends JavaPlugin {
             public void run() {
                 if (list.size() == max) {
                     p = null;
+                    sum = (mo*list.size())+1;
                     list = new ArrayList<>();
                     max = 0;
                     mo = 0;
+                    PickMoney(p,mo);
+                    for (Player p:list) {
+                        PickMoney(p,mo);
+                    }
                     int r1,r2,r3;
                     r1 = random.nextInt(6);
                     r2 = random.nextInt(6);
@@ -184,15 +189,66 @@ public final class Uchiro extends JavaPlugin {
                     Bukkit.broadcastMessage(prefix+"UCRが開始されました");
                     Bukkit.broadcastMessage(prefix+"親はダイスを回して"+r1+"   "+r2+"   "+r3+"が出た");
                     //親が役を出したときのなんか
+                    String yaku = "noyaku";
+                    try {
+                        yaku = config.getString("hit."+r1+"."+r2+"."+r3);
+                    } catch (NullPointerException e) {
+
+                    }
+                    if (!yaku.equals("noyaku")) {
+                        GiveMoney(p,sum);
+                        Bukkit.broadcastMessage(prefix+"親が役を出したため親が全て回収します");
+                        uc = false;
+                        return;
+                    }
+                    if (yaku.equals("out")) {
+                        config.set("stock",config.getInt("stock",0)+sum);
+                        Bukkit.broadcastMessage(prefix+"没収!\n没収されたお金はストックされます");
+                        uc = false;
+                        return;
+                    }
+                    Bukkit.broadcastMessage(prefix+"役無し");
+                    int hit = 0;
+                    int roll = 0;
+                    List<Player> l = new ArrayList<>();
                     for (Player s :list) {
+                        yaku = "noyaku";
                         int rr1,rr2,rr3;
                         rr1 = random.nextInt(6);
                         rr2 = random.nextInt(6);
                         rr3 = random.nextInt(6);
                         Bukkit.broadcastMessage(prefix+s.getName()+"はダイスを回して"+rr1+"   "+rr2+"   "+rr3+"が出た");
                         //ここでなんの役なのかとか
+                        try {
+                            yaku = config.getString("hit."+rr1+"."+rr2+"."+rr3);
+                        } catch (NullPointerException e) {
+
+                        }
+                        if (yaku.equals("out")) {
+                            config.set("stock",config.getInt("stock",0)+sum);
+                            Bukkit.broadcastMessage(prefix+"没収!\n没収されたお金はストックされます");
+                            uc = false;
+                            cancel();
+                            return;
+                        }
+                        if (yaku.equals("noyaku")) {
+                            l.add(list.get(roll));
+                            hit++;
+                        } else {
+                            Bukkit.broadcastMessage(prefix+"役無し");
+                        }
+                        roll++;
                     }
-                    //親が役を出さなかったときのなんか
+                    if (hit == 0) {
+                        Bukkit.broadcastMessage(prefix+"役を出した人がいなかったため没収されます");
+                        config.set("stock",config.getInt("stock")+sum);
+                    } else {
+                        Bukkit.broadcastMessage(prefix+"役を出したプレイヤーにおかねを配分します");
+                        for (int z = 0 ;z > hit;z++) {
+                            GiveMoney(list.get(z),sum/hit);
+                        }
+                    }
+                    uc = false;
                     cancel();
                 }
                 if (count == 0) {
@@ -208,5 +264,13 @@ public final class Uchiro extends JavaPlugin {
             }
         };
         task.runTaskTimer(this,20,20);
+    }
+
+    public void PickMoney(Player p,int money) {
+        //moneyをpから取る
+    }
+
+    public void GiveMoney(Player p,int money) {
+        //money円をpに配る
     }
 }
