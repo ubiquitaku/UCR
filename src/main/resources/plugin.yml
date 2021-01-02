@@ -1,0 +1,6 @@
+name: Uchiro
+version: ${project.version}
+main: ubiquitaku.uchiro.Uchiro
+api-version: 1.16
+commands:
+  ucr:
