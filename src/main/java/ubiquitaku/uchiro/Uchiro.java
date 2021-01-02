@@ -94,10 +94,15 @@ public final class Uchiro extends JavaPlugin {
             if (args[0].equals("join")) {
                 if (!uc) {
                     sender.sendMessage(prefix+"現在UCRは行われていません");
-                }
-                if (sender.getName().equals(p.getName())) {
-                    sender.sendMessage(prefix+"あなたは親のため現在子としての参かはできません");
                     return true;
+                }
+                try {
+                    if (sender.getName().equals(p.getName())) {
+                        sender.sendMessage(prefix + "あなたは親のため現在子としての参かはできません");
+                        return true;
+                    }
+                } catch (NullPointerException e) {
+
                 }
                 if (list.contains((Player) sender)) {
                     sender.sendMessage(prefix+"あなたは既に参加しています");
@@ -173,6 +178,7 @@ public final class Uchiro extends JavaPlugin {
             @Override
             public void run() {
                 if (list.size() == max) {
+                    String yaku = "noyaku";
                     p = null;
                     sum = (mo*list.size())+1;
                     list = new ArrayList<>();
@@ -183,46 +189,49 @@ public final class Uchiro extends JavaPlugin {
                         PickMoney(p,mo);
                     }
                     int r1,r2,r3;
-                    r1 = random.nextInt(6);
-                    r2 = random.nextInt(6);
-                    r3 = random.nextInt(6);
+                    r1 = random.nextInt(6)+1;
+                    r2 = random.nextInt(6)+1;
+                    r3 = random.nextInt(6)+1;
                     Bukkit.broadcastMessage(prefix+"UCRが開始されました");
                     Bukkit.broadcastMessage(prefix+"親はダイスを回して"+r1+"   "+r2+"   "+r3+"が出た");
                     //親が役を出したときのなんか
-                    String yaku = "noyaku";
                     try {
                         yaku = config.getString("hit."+r1+"."+r2+"."+r3);
                     } catch (NullPointerException e) {
-
+                        yaku = "noyaku";
+                        Bukkit.broadcastMessage("ヽ(ﾟ∀｡)ﾉｳｪ");
                     }
                     if (!yaku.equals("noyaku")) {
                         GiveMoney(p,sum);
+                        Bukkit.broadcastMessage(prefix+yaku);
                         Bukkit.broadcastMessage(prefix+"親が役を出したため親が全て回収します");
                         uc = false;
+                        cancel();
                         return;
                     }
                     if (yaku.equals("out")) {
                         config.set("stock",config.getInt("stock",0)+sum);
                         Bukkit.broadcastMessage(prefix+"没収!\n没収されたお金はストックされます");
                         uc = false;
+                        cancel();
                         return;
                     }
-                    Bukkit.broadcastMessage(prefix+"役無し");
+                    Bukkit.broadcastMessage(prefix+"親役無し");
                     int hit = 0;
                     int roll = 0;
                     List<Player> l = new ArrayList<>();
                     for (Player s :list) {
                         yaku = "noyaku";
                         int rr1,rr2,rr3;
-                        rr1 = random.nextInt(6);
-                        rr2 = random.nextInt(6);
-                        rr3 = random.nextInt(6);
+                        rr1 = random.nextInt(6)+1;
+                        rr2 = random.nextInt(6)+1;
+                        rr3 = random.nextInt(6)+1;
                         Bukkit.broadcastMessage(prefix+s.getName()+"はダイスを回して"+rr1+"   "+rr2+"   "+rr3+"が出た");
                         //ここでなんの役なのかとか
                         try {
                             yaku = config.getString("hit."+rr1+"."+rr2+"."+rr3);
                         } catch (NullPointerException e) {
-
+                            yaku = "noyaku";
                         }
                         if (yaku.equals("out")) {
                             config.set("stock",config.getInt("stock",0)+sum);
@@ -231,11 +240,12 @@ public final class Uchiro extends JavaPlugin {
                             cancel();
                             return;
                         }
+                        Bukkit.broadcastMessage("ヽ(ﾟ∀｡)ﾉｳｪ");
                         if (yaku.equals("noyaku")) {
                             l.add(list.get(roll));
                             hit++;
                         } else {
-                            Bukkit.broadcastMessage(prefix+"役無し");
+                            Bukkit.broadcastMessage(prefix+"子役無し");
                         }
                         roll++;
                     }
@@ -268,9 +278,11 @@ public final class Uchiro extends JavaPlugin {
 
     public void PickMoney(Player p,int money) {
         //moneyをpから取る
+        return;
     }
 
     public void GiveMoney(Player p,int money) {
         //money円をpに配る
+        return;
     }
 }
