@@ -10,6 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public final class Uchiro extends JavaPlugin {
     FileConfiguration config;
@@ -21,6 +22,7 @@ public final class Uchiro extends JavaPlugin {
     int mo;
     int max;
     int stock;
+    Random random = new Random();
 
     @Override
     public void onEnable() {
@@ -109,6 +111,11 @@ public final class Uchiro extends JavaPlugin {
                     return true;
                 }
                 list.add((Player) sender);
+                sender.sendMessage(prefix+"参加しました");
+                p.sendMessage(prefix+sender.getName()+"が参加しました");
+                for (Player n : list) {
+                    n.sendMessage(prefix+sender.getName()+"が参加しました");
+                }
                 return true;
             }
             if (!sender.isOp()) {
@@ -165,6 +172,29 @@ public final class Uchiro extends JavaPlugin {
             int count = i;
             @Override
             public void run() {
+                if (list.size() == max) {
+                    p = null;
+                    list = new ArrayList<>();
+                    max = 0;
+                    mo = 0;
+                    int r1,r2,r3;
+                    r1 = random.nextInt(6);
+                    r2 = random.nextInt(6);
+                    r3 = random.nextInt(6);
+                    Bukkit.broadcastMessage(prefix+"UCRが開始されました");
+                    Bukkit.broadcastMessage(prefix+"親はダイスを回して"+r1+"   "+r2+"   "+r3+"が出た");
+                    //親が役を出したときのなんか
+                    for (Player s :list) {
+                        int rr1,rr2,rr3;
+                        rr1 = random.nextInt(6);
+                        rr2 = random.nextInt(6);
+                        rr3 = random.nextInt(6);
+                        Bukkit.broadcastMessage(prefix+s.getName()+"はダイスを回して"+rr1+"   "+rr2+"   "+rr3+"が出た");
+                        //ここでなんの役なのかとか
+                    }
+                    //親が役を出さなかったときのなんか
+                    cancel();
+                }
                 if (count == 0) {
                     p = null;
                     list = new ArrayList<>();
