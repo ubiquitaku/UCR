@@ -88,7 +88,7 @@ public final class Uchiro extends JavaPlugin {
                 mo = Integer.parseInt(args[1]);
                 max = Integer.parseInt(args[2]);
                 Bukkit.broadcastMessage(prefix+"§l"+sender.getName()+"§r§lが"+args[1]+"円のUCRを始めました\n§l募集人数"+args[2]+"人");
-                Runnable();
+                runnable();
                 return true;
             }
             if (args[0].equals("join")) {
@@ -171,7 +171,7 @@ public final class Uchiro extends JavaPlugin {
         return true;
     }
 
-    public void Runnable() {
+    public void runnable() {
         final int i = 10;
         BukkitRunnable task = new BukkitRunnable() {
             int count = i;
@@ -184,8 +184,18 @@ public final class Uchiro extends JavaPlugin {
                     list = new ArrayList<>();
                     max = 0;
                     mo = 0;
+                    if (!HasMoney(p,mo)) {
+                        Bukkit.broadcastMessage(prefix+"親の所持金が足りていなかったため中断します");
+                        cancel();
+                        return;
+                    }
                     PickMoney(p,mo);
                     for (Player p:list) {
+                        if (HasMoney(p,mo)) {
+                            Bukkit.broadcastMessage(prefix+"子の所持金が足りていなかったため中断します");
+                            cancel();
+                            return;
+                        }
                         PickMoney(p,mo);
                     }
                     int r1,r2,r3;
@@ -195,11 +205,10 @@ public final class Uchiro extends JavaPlugin {
                     Bukkit.broadcastMessage(prefix+"UCRが開始されました");
                     Bukkit.broadcastMessage(prefix+"親はダイスを回して"+r1+"   "+r2+"   "+r3+"が出た");
                     //親が役を出したときのなんか
-                    try {
-                        yaku = config.getString("hit."+r1+"."+r2+"."+r3);
-                    } catch (NullPointerException e) {
+                    yaku = config.getString("hit."+r1+"."+r2+"."+r3);
+                    Bukkit.broadcastMessage(yaku);
+                    if (yaku == null) {
                         yaku = "noyaku";
-                        Bukkit.broadcastMessage("ヽ(ﾟ∀｡)ﾉｳｪ");
                     }
                     if (!yaku.equals("noyaku")) {
                         GiveMoney(p,sum);
