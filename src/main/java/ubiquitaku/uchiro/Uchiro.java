@@ -167,7 +167,7 @@ public final class Uchiro extends JavaPlugin {
     }
 
     public boolean HasMoney(Player s, int m) {
-        //ここで所持金が足りているかの判定をする、エラー吐かれたくないから今はreturn true;で終わらせておく
+        //ここで所持金が足りているかの判定をする(sがm以上持っているか)、エラー吐かれたくないから今はreturn true;で終わらせておく
         return true;
     }
 
@@ -206,7 +206,6 @@ public final class Uchiro extends JavaPlugin {
                     Bukkit.broadcastMessage(prefix+"親はダイスを回して"+r1+"   "+r2+"   "+r3+"が出た");
                     //親が役を出したときのなんか
                     yaku = config.getString("hit."+r1+"."+r2+"."+r3);
-                    Bukkit.broadcastMessage(yaku);
                     if (yaku == null) {
                         yaku = "noyaku";
                     }
@@ -220,7 +219,7 @@ public final class Uchiro extends JavaPlugin {
                     }
                     if (yaku.equals("out")) {
                         config.set("stock",config.getInt("stock",0)+sum);
-                        Bukkit.broadcastMessage(prefix+"没収!\n没収されたお金はストックされます");
+                        Bukkit.broadcastMessage(prefix+"没収！\n没収されたお金はストックされます");
                         uc = false;
                         cancel();
                         return;
@@ -229,7 +228,8 @@ public final class Uchiro extends JavaPlugin {
                     int hit = 0;
                     int roll = 0;
                     List<Player> l = new ArrayList<>();
-                    for (Player s :list) {
+                    for (Player s : list) {
+                        Bukkit.broadcastMessage(prefix+prefix+prefix);
                         yaku = "noyaku";
                         int rr1,rr2,rr3;
                         rr1 = random.nextInt(6)+1;
@@ -244,7 +244,7 @@ public final class Uchiro extends JavaPlugin {
                         }
                         if (yaku.equals("out")) {
                             config.set("stock",config.getInt("stock",0)+sum);
-                            Bukkit.broadcastMessage(prefix+"没収!\n没収されたお金はストックされます");
+                            Bukkit.broadcastMessage(prefix+"没収！\n没収されたお金はストックされます");
                             uc = false;
                             cancel();
                             return;
