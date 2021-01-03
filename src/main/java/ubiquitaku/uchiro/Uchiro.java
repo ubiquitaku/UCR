@@ -178,9 +178,10 @@ public final class Uchiro extends JavaPlugin {
             @Override
             public void run() {
                 if (list.size() == max) {
+                    List<Player> pls = list;
                     String yaku = "noyaku";
                     p = null;
-                    sum = (mo*list.size())+1;
+                    sum = mo*(list.size()+1);
                     list = new ArrayList<>();
                     max = 0;
                     mo = 0;
@@ -190,8 +191,8 @@ public final class Uchiro extends JavaPlugin {
                         return;
                     }
                     PickMoney(p,mo);
-                    for (Player p:list) {
-                        if (HasMoney(p,mo)) {
+                    for (Player p:pls) {
+                        if (!HasMoney(p,mo)) {
                             Bukkit.broadcastMessage(prefix+"子の所持金が足りていなかったため中断します");
                             cancel();
                             return;
@@ -219,6 +220,7 @@ public final class Uchiro extends JavaPlugin {
                     }
                     if (yaku.equals("out")) {
                         config.set("stock",config.getInt("stock",0)+sum);
+                        saveConfig();
                         Bukkit.broadcastMessage(prefix+"没収！\n没収されたお金はストックされます");
                         uc = false;
                         cancel();
@@ -228,8 +230,7 @@ public final class Uchiro extends JavaPlugin {
                     int hit = 0;
                     int roll = 0;
                     List<Player> l = new ArrayList<>();
-                    for (Player s : list) {
-                        Bukkit.broadcastMessage(prefix+prefix+prefix);
+                    for (Player s : pls) {
                         yaku = "noyaku";
                         int rr1,rr2,rr3;
                         rr1 = random.nextInt(6)+1;
@@ -242,16 +243,20 @@ public final class Uchiro extends JavaPlugin {
                         } catch (NullPointerException e) {
                             yaku = "noyaku";
                         }
+                        if (yaku == null) {
+                            yaku = "noyaku";
+                        }
                         if (yaku.equals("out")) {
                             config.set("stock",config.getInt("stock",0)+sum);
+                            saveConfig();
                             Bukkit.broadcastMessage(prefix+"没収！\n没収されたお金はストックされます");
                             uc = false;
                             cancel();
                             return;
                         }
                         Bukkit.broadcastMessage("ヽ(ﾟ∀｡)ﾉｳｪ");
-                        if (yaku.equals("noyaku")) {
-                            l.add(list.get(roll));
+                        if (!yaku.equals("noyaku")) {
+                            l.add(pls.get(roll));
                             hit++;
                         } else {
                             Bukkit.broadcastMessage(prefix+"子役無し");
@@ -261,6 +266,7 @@ public final class Uchiro extends JavaPlugin {
                     if (hit == 0) {
                         Bukkit.broadcastMessage(prefix+"役を出した人がいなかったため没収されます");
                         config.set("stock",config.getInt("stock")+sum);
+                        saveConfig();
                     } else {
                         Bukkit.broadcastMessage(prefix+"役を出したプレイヤーにおかねを配分します");
                         for (int z = 0 ;z > hit;z++) {
